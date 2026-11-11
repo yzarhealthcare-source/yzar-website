@@ -1,0 +1,125 @@
+[
+ {
+  "name": "Ibravit-OD Softgel Capsules",
+  "info": "Omega 3 (EPA & DHA), Lycopene, Ginkgo Biloba, Green Tea Extract, Vitamins & Minerals",
+  "pack": "10 softgel capsules",
+  "price": null,
+  "rx": false,
+  "icon": "💊",
+  "images": [
+   "ibravit-od-softgel-capsules-1.jpg",
+   "ibravit-od-softgel-capsules-2.jpg",
+   "ibravit-od-softgel-capsules-3.jpg",
+   "ibravit-od-softgel-capsules-4.jpg"
+  ],
+  "desc": "Dietary food supplement softgel capsules with Omega 3 (EPA & DHA), Lycopene, Ginkgo Biloba, Green Tea Extract, vitamins and minerals.",
+  "long_desc": "Ibravit-OD is a dietary food supplement in softgel capsule form, marketed by Yzar Healthcare. See the product photos for the complete composition printed on the pack.",
+  "composition": [
+   "Omega 3 Fatty Acid (EPA & DHA)",
+   "Lycopene",
+   "Cyanocobalamin",
+   "L-Lysine",
+   "Green Tea Extract",
+   "Ginkgo Biloba",
+   "Zinc Sulphate",
+   "Calcium Pantothenate",
+   "Multivitamins and Multiminerals"
+  ],
+  "how_to_use": "One capsule daily after meals, or as directed by the dietician.",
+  "warnings": [
+   "Dietary food supplement.",
+   "Keep out of reach of children."
+  ],
+  "storage": "Store in a cool, dry and dark place.",
+  "manufacturer": "Marketed by Yzar Healthcare (a division of Alibra Healthcare), N-111-B, New Delhi – 110025"
+ },
+ {
+  "name": "Calida Max Tablets",
+  "info": "Calcium Carbonate, Calcitriol, Vitamin K2-7, Cyanocobalamin, Vitamin D3 & Magnesium",
+  "pack": "10 tablets",
+  "price": null,
+  "rx": false,
+  "icon": "💊",
+  "images": [
+   "calida-max-tablets-1.jpg",
+   "calida-max-tablets-2.jpg",
+   "calida-max-tablets-3.jpg",
+   "calida-max-tablets-4.jpg"
+  ],
+  "desc": "Calcium Carbonate, Calcitriol, Vitamin K2-7, Cyanocobalamin, Vitamin D3 and Magnesium film coated tablets.",
+  "long_desc": "Calida Max is a dietary food supplement tablet marketed by Yzar Healthcare. It is not for medicinal use.",
+  "composition": [
+   "Calcium Carbonate 500 mg (eq. to elemental Calcium 500 mg)",
+   "Calcitriol 0.25 mcg",
+   "Vitamin K2-7 45 mcg",
+   "Cyanocobalamin 2.2 mcg",
+   "Magnesium Sulphate 70 mg",
+   "Vitamin D3 1000 IU",
+   "Per film coated tablet (approx.), as printed on the pack"
+  ],
+  "how_to_use": "As prescribed by the dietician.",
+  "warnings": [
+   "Dietary food supplement. Not for medicinal use.",
+   "Keep out of reach of children."
+  ],
+  "storage": "Store in a cool and dry place. Protect from direct sunlight and moisture.",
+  "manufacturer": "Manufactured by Ayan Biotech, Derabassi, Punjab. Marketed by Yzar Healthcare (a division of Alibra Healthcare), New Delhi"
+ },
+ {
+  "name": "Livexa DS Tablets",
+  "info": "Pancreatin, L-Ornithine L-Aspartate, Silymarin, Pyridoxine HCl, Folic Acid",
+  "pack": "10 tablets",
+  "price": null,
+  "rx": false,
+  "icon": "💊",
+  "images": [
+   "livexa-ds-tablets-1.jpg",
+   "livexa-ds-tablets-2.jpg",
+   "livexa-ds-tablets-3.jpg",
+   "livexa-ds-tablets-4.jpg"
+  ],
+  "desc": "Pancreatin, L-Ornithine L-Aspartate, Silymarin, Pyridoxine HCl and Folic Acid tablets.",
+  "long_desc": "Livexa DS Tablets are a dietary food supplement marketed by Yzar Healthcare. See the product photos for the full composition printed on the pack.",
+  "composition": [
+   "Pancreatin",
+   "L-Ornithine L-Aspartate",
+   "Silymarin",
+   "Pyridoxine HCl",
+   "Folic Acid"
+  ],
+  "warnings": [
+   "Dietary food supplement.",
+   "Appropriate overages of vitamins added to compensate loss on storage."
+  ],
+  "manufacturer": "Marketed by Yzar Healthcare (a division of Alibra Healthcare), N-111-B, New Delhi – 110025"
+ },
+ {
+  "name": "Livexa DS Syrup",
+  "info": "Ayurvedic liver tonic with enzymes, 200 ml",
+  "pack": "200 ml bottle",
+  "price": null,
+  "rx": false,
+  "icon": "🧴",
+  "images": [
+   "livexa-ds-syrup-1.jpg",
+   "livexa-ds-syrup-2.jpg",
+   "livexa-ds-syrup-3.jpg",
+   "livexa-ds-syrup-4.jpg"
+  ],
+  "desc": "Livexa DS Syrup is an Ayurvedic liver tonic with enzymes that supports healthy digestive function and liver detoxification.",
+  "long_desc": "A tonic for liver protection, made with Ayurvedic herbs and enzymes. It is sugar free. Marketed by Yzar Healthcare. See the product photos for the full composition printed on the pack.",
+  "uses": [
+   "A tonic for liver protection",
+   "Supports healthy digestive function",
+   "Supports liver detoxification",
+   "Sugar free"
+  ],
+  "how_to_use": "As directed by the dietician. Shake well before use.",
+  "warnings": [
+   "Dietary food supplement.",
+   "Keep out of reach of children."
+  ],
+  "storage": "Store in a cool, dry and dark place. Protect from direct sunlight.",
+  "manufacturer": "Manufactured by Noble Ayurveda, SAS Nagar (Punjab). Marketed by Yzar Healthcare (a division of Alibra Healthcare), New Delhi"
+ }
+]
