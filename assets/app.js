@@ -1,4 +1,7 @@
 const WA="919354561001",SITE="https://yzarhealthcare.com";
+/* open WhatsApp: same tab on phones (avoids the blank tab left behind), new tab on desktop */
+const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(matchMedia("(pointer:coarse)").matches&&innerWidth<900);
+function openWA(u){if(isMobile)location.href=u;else{const w=window.open(u,"_blank");if(w)w.opener=null;else location.href=u}}
 const link=p=>`${SITE}/medicine/${p.slug}.html`;
 const $=s=>document.querySelector(s);
 let cart={};try{cart=JSON.parse(localStorage.getItem("yzcart")||"{}")}catch(e){}
@@ -33,7 +36,7 @@ function wa(items,n,ph,a,tag){let tot=0,all=true,m="*New Order – Yzar Healthca
  items.forEach(([i,q],k)=>{const p=prod(i);m+=`${k+1}. ${p.name} (${p.pack}) × ${q}${p.price?" @ "+rs(p.price):""}\n${link(p)}\n`;if(p.price)tot+=p.price*q;else all=false});
  if(tot)m+=`\nEstimated total: ${rs(tot)}${all?"":" + items with price to be confirmed"}\n`;
  m+=`\n*Name:* ${n}\n*Mobile:* ${ph}\n*Address:* ${a}`;
- const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;if(!window.open(u,"_blank"))location.href=u}
+ const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;openWA(u)}
 function order(){const ids=Object.keys(cart).filter(prod),er=$("#derr");if(!ids.length){er.textContent="Your cart is empty. Please add a medicine first.";return}
  const n=$("#nm").value.trim(),ph=$("#ph").value.trim(),ad=$("#ad").value.trim();if(!valid(n,ph,ad,er))return;
  cust.set({n,p:ph,a:ad});wa(ids.map(i=>[i,cart[i]]),n,ph,ad)}
@@ -43,7 +46,7 @@ function buyNow(id){const p=prod(id),q=qs[id]||1,c=cust.get();
  if(p.price)m+=`\nEstimated total: ${rs(p.price*q)}\n`;
  m+=`\n*Name:* ${c.n||""}\n*Address:* ${c.a||""}`;
  qs[id]=1;const el=$("#q"+id);if(el)el.textContent=1;
- const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;if(!window.open(u,"_blank"))location.href=u;
+ const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;openWA(u);
  toast("✓ Opening WhatsApp… tap send to place your order")}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCart()}});
 document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".df"))$("#derr").textContent=""});
@@ -77,7 +80,7 @@ const cf=$("#cf");if(cf){
  const body=d=>`Name: ${d.n}\nMobile: ${d.p}${d.e?"\nEmail: "+d.e:""}\nTopic: ${d.t}\n\nMessage:\n${d.m}`;
  cf.addEventListener("submit",ev=>{ev.preventDefault();const d=check();if(!d)return;
   const u=`https://wa.me/${WA}?text=${encodeURIComponent("*New Enquiry – Yzar Healthcare*\n\n"+body(d))}`;
-  if(!window.open(u,"_blank"))location.href=u;toast("✓ Opening WhatsApp… tap send to deliver your message")});
+  openWA(u);toast("✓ Opening WhatsApp… tap send to deliver your message")});
  $("#cmail").addEventListener("click",()=>{const d=check();if(!d)return;
   location.href=`mailto:yzarhealthcare@gmail.com?subject=${encodeURIComponent("Enquiry: "+d.t)}&body=${encodeURIComponent(body(d))}`});
 }
@@ -89,3 +92,7 @@ document.addEventListener("click",e=>{if(nv.classList.contains("open")&&!nv.cont
 nv.querySelectorAll("a").forEach(l=>l.addEventListener("click",()=>set(false)));
 document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
 addEventListener("resize",()=>{if(innerWidth>1000)set(false)})})();
+
+/* WhatsApp links: same tab on phones; refresh UI when coming back from WhatsApp */
+if(isMobile)document.querySelectorAll('a[href*="wa.me"]').forEach(l=>{l.removeAttribute("target");l.removeAttribute("rel")});
+addEventListener("pageshow",e=>{if(e.persisted){const t=$("#toast");if(t)t.classList.remove("show");closeCart();document.body.style.overflow=""}});
