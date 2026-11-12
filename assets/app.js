@@ -11,7 +11,7 @@ function card(p){return `<article class="p rv in"><a class="pi" href="${ROOT}med
 <h3><a href="${ROOT}medicine/${p.slug}.html">${p.name}</a></h3><small>${p.info}</small><small>Pack: ${p.pack}</small>
 ${p.rx?'<span class="rx">Prescription required</span>':''}<div class="price">${priceH(p)}</div>
 <div class="row"><div class="qty"><button onclick="qty(${p.id},-1)" aria-label="Decrease">−</button><span id="q${p.id}">1</span><button onclick="qty(${p.id},1)" aria-label="Increase">+</button></div>
-<button class="add" onclick="add(${p.id})">Add to Cart</button></div></div></article>`}
+<button class="add" onclick="add(${p.id})">Add to Cart</button></div><button class="buy" onclick="buyNow(${p.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg> Buy Now</button></div></article>`}
 function grid(){const g=$("#grid");if(!g)return;const t=($("#q")?$("#q").value:"").toLowerCase(),lim=+g.dataset.limit||999;
 g.innerHTML=PRODUCTS.filter(p=>(p.name+p.info).toLowerCase().includes(t)).slice(0,lim).map(card).join("")||'<p class="empty" style="grid-column:1/-1">No medicine found. Message us on WhatsApp.</p>'}
 function qty(id,d){qs[id]=Math.max(1,(qs[id]||1)+d);const e=$("#q"+id);if(e)e.textContent=qs[id]}
@@ -22,16 +22,45 @@ function upd(){const ids=Object.keys(cart).filter(prod);$("#cc").textContent=ids
 $("#items").innerHTML=ids.length?ids.map(i=>{const p=prod(i);return `<div class="it"><div><b>${p.name}</b><small>${p.pack}${p.price?' · '+rs(p.price):''}${off(p)?' <s class="old">'+rs(p.mrp)+'</s>':''}</small></div><div class="qty"><button onclick="chg(${i},-1)">−</button><span>${cart[i]}</span><button onclick="chg(${i},1)">+</button></div></div>`}).join(""):'<p class="empty">Your cart is empty</p>'}
 function openCart(){$("#drawer").classList.add("open");$("#ov").classList.add("open")}
 function closeCart(){$("#drawer").classList.remove("open");$("#ov").classList.remove("open")}
-function order(){const ids=Object.keys(cart).filter(prod);if(!ids.length)return alert("Please add at least one medicine.");
-const n=$("#nm").value.trim(),ph=$("#ph").value.trim(),a=$("#ad").value.trim();if(!n||!ph||!a)return alert("Please enter your name, mobile number and address.");
-let tot=0,all=true,m="*New Order – Yzar Healthcare*\n\n";
-ids.forEach((i,k)=>{const p=prod(i);m+=`${k+1}. ${p.name} (${p.pack}) × ${cart[i]}${p.price?" @ "+rs(p.price):""}\n`;if(p.price)tot+=p.price*cart[i];else all=false});
-if(tot)m+=`\nEstimated total: ${rs(tot)}${all?"":" + items with price to be confirmed"}\n`;
-m+=`\n*Name:* ${n}\n*Mobile:* ${ph}\n*Address:* ${a}`;
-window.open(`https://wa.me/${WA}?text=${encodeURIComponent(m)}`,"_blank")}
+const cust={get(){try{return JSON.parse(localStorage.getItem("yzcust")||"{}")}catch(e){return{}}},set(d){try{localStorage.setItem("yzcust",JSON.stringify(d))}catch(e){}}};
+function valid(n,ph,ad,er){const bad=m=>{er.textContent=m;return false};
+ if(n.length<2)return bad("Please enter your name.");
+ if(!/^[+]?[0-9 ]{10,14}$/.test(ph))return bad("Please enter a valid mobile number.");
+ if(ad.length<8)return bad("Please enter your full delivery address with PIN code.");
+ er.textContent="";return true}
+function wa(items,n,ph,a,tag){let tot=0,all=true,m="*New Order – Yzar Healthcare*"+(tag?" ("+tag+")":"")+"\n\n";
+ items.forEach(([i,q],k)=>{const p=prod(i);m+=`${k+1}. ${p.name} (${p.pack}) × ${q}${p.price?" @ "+rs(p.price):""}\n`;if(p.price)tot+=p.price*q;else all=false});
+ if(tot)m+=`\nEstimated total: ${rs(tot)}${all?"":" + items with price to be confirmed"}\n`;
+ m+=`\n*Name:* ${n}\n*Mobile:* ${ph}\n*Address:* ${a}`;
+ const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;if(!window.open(u,"_blank"))location.href=u}
+function order(){const ids=Object.keys(cart).filter(prod),er=$("#derr");if(!ids.length){er.textContent="Your cart is empty. Please add a medicine first.";return}
+ const n=$("#nm").value.trim(),ph=$("#ph").value.trim(),ad=$("#ad").value.trim();if(!valid(n,ph,ad,er))return;
+ cust.set({n,p:ph,a:ad});wa(ids.map(i=>[i,cart[i]]),n,ph,ad)}
+/* Buy Now – quick order popup */
+let bn={id:0,q:1};
+function renderBN(){const p=prod(bn.id);
+ $("#bn-i").innerHTML=`<div class="th">${p.images&&p.images.length?`<img src="${ROOT}images/${p.images[0]}" alt="${p.name}">`:p.icon}</div><div class="mt"><b>${p.name}</b><small>${p.pack}</small><div class="price" style="font-size:1rem">${priceH(p)}</div>
+ <div class="tt"><div class="qty"><button type="button" onclick="bq(-1)" aria-label="Decrease">−</button><span>${bn.q}</span><button type="button" onclick="bq(1)" aria-label="Increase">+</button></div><small><b style="display:inline;color:var(--tx)">${p.price?"Total "+rs(p.price*bn.q):"Price confirmed on WhatsApp"}</b></small></div></div>`}
+function bq(d){bn.q=Math.max(1,bn.q+d);renderBN()}
+function buyNow(id){bn={id,q:qs[id]||1};renderBN();const c=cust.get();$("#bn-n").value=c.n||"";$("#bn-m").value=c.p||"";$("#bn-a").value=c.a||"";$("#bn-e").textContent="";
+ $("#qm").classList.add("open");$("#qov").classList.add("open");document.body.style.overflow="hidden";setTimeout(()=>$(c.n?"#bn-a":"#bn-n").focus({preventScroll:true}),120)}
+function closeBN(){$("#qm").classList.remove("open");$("#qov").classList.remove("open");document.body.style.overflow=""}
+function bnOrder(){const n=$("#bn-n").value.trim(),ph=$("#bn-m").value.trim(),ad=$("#bn-a").value.trim();if(!valid(n,ph,ad,$("#bn-e")))return;
+ cust.set({n,p:ph,a:ad});wa([[bn.id,bn.q]],n,ph,ad,"Buy Now");qs[bn.id]=1;const e=$("#q"+bn.id);if(e)e.textContent=1;closeBN()}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeBN();closeCart()}});
+document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#qm"))$("#bn-e").textContent="";else if(e.target.closest&&e.target.closest(".df"))$("#derr").textContent=""});
 document.body.insertAdjacentHTML("beforeend",`<div class="fab"><a class="w" href="https://wa.me/${WA}?text=Hello%20Yzar%20Healthcare" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">💬</a><a class="c" href="tel:+919315161042" aria-label="Call us">📞</a></div>
 <div class="ov" id="ov" onclick="closeCart()"></div><aside class="drawer" id="drawer" aria-label="Cart"><div class="dh"><b>Your Cart</b><button onclick="closeCart()" aria-label="Close">×</button></div><div class="items" id="items"></div>
-<div class="df"><input id="nm" placeholder="Your name" autocomplete="name"><input id="ph" placeholder="Your mobile number" inputmode="tel" autocomplete="tel"><textarea id="ad" rows="2" placeholder="Delivery address with PIN code" autocomplete="street-address"></textarea><button class="btn wa" onclick="order()">Order on WhatsApp</button></div></aside>`);
+<div class="df"><input id="nm" placeholder="Your name" autocomplete="name"><input id="ph" placeholder="Your mobile number" inputmode="tel" autocomplete="tel"><textarea id="ad" rows="2" placeholder="Delivery address with PIN code" autocomplete="street-address"></textarea><p class="cerr" id="derr" role="alert"></p><button class="btn wa" onclick="order()">Order on WhatsApp</button></div></aside>
+<div class="qov" id="qov" onclick="closeBN()"></div>
+<div class="qm" id="qm" role="dialog" aria-modal="true" aria-labelledby="qt"><div class="qh"><b id="qt">Quick Order</b><button type="button" onclick="closeBN()" aria-label="Close">×</button></div>
+<div class="qb"><div class="qi" id="bn-i"></div>
+<div class="fr"><label for="bn-n">Your name</label><input id="bn-n" autocomplete="name"></div>
+<div class="fr"><label for="bn-m">Mobile number</label><input id="bn-m" type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile number"></div>
+<div class="fr"><label for="bn-a">Delivery address</label><textarea id="bn-a" rows="2" autocomplete="street-address" placeholder="House no, area, city, PIN code"></textarea></div>
+<p class="cerr" id="bn-e" role="alert"></p><button class="btn wa" type="button" onclick="bnOrder()">Order on WhatsApp</button>
+<p class="qn">🔒 Your details are used only to process this order. WhatsApp opens with your order ready to send.</p></div></div>`);
+{const c=cust.get();if(c.n)$("#nm").value=c.n;if(c.p)$("#ph").value=c.p;if(c.a)$("#ad").value=c.a}
 const sl=$("#slides");let cur=0,tm;
 if(sl){const N=sl.children.length;$("#dots").innerHTML=[...Array(N)].map((_,i)=>`<button onclick="to(${i})" aria-label="Slide ${i+1}"></button>`).join("");
 window.to=i=>{cur=(i+N)%N;sl.style.transform=`translateX(-${cur*100}%)`;[...$("#dots").children].forEach((d,k)=>d.classList.toggle("on",k==cur));[...sl.children].forEach((s,k)=>s.classList.toggle("act",k==cur));clearInterval(tm);tm=setInterval(()=>to(cur+1),5000)};
