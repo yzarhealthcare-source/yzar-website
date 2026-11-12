@@ -90,3 +90,11 @@ const cf=$("#cf");if(cf){
  $("#cmail").addEventListener("click",()=>{const d=check();if(!d)return;
   location.href=`mailto:yzarhealthcare@gmail.com?subject=${encodeURIComponent("Enquiry: "+d.t)}&body=${encodeURIComponent(body(d))}`});
 }
+/* mobile menu: icon becomes ✕, closes on outside tap / Esc / link / resize */
+(()=>{const hb=$(".hb"),nv=$("#nav");if(!hb||!nv)return;hb.removeAttribute("onclick");hb.setAttribute("aria-controls","nav");
+const set=o=>{nv.classList.toggle("open",o);hb.classList.toggle("on",o);hb.textContent=o?"✕":"☰";hb.setAttribute("aria-expanded",o);hb.setAttribute("aria-label",o?"Close menu":"Open menu")};
+set(false);hb.addEventListener("click",e=>{e.stopPropagation();set(!nv.classList.contains("open"))});
+document.addEventListener("click",e=>{if(nv.classList.contains("open")&&!nv.contains(e.target))set(false)});
+nv.querySelectorAll("a").forEach(l=>l.addEventListener("click",()=>set(false)));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
+addEventListener("resize",()=>{if(innerWidth>1000)set(false)})})();
