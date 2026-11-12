@@ -1,4 +1,5 @@
-const WA="919354561001";
+const WA="919354561001",SITE="https://yzarhealthcare.com";
+const link=p=>`${SITE}/medicine/${p.slug}.html`;
 const $=s=>document.querySelector(s);
 let cart={};try{cart=JSON.parse(localStorage.getItem("yzcart")||"{}")}catch(e){}
 const qs={};
@@ -29,37 +30,27 @@ function valid(n,ph,ad,er){const bad=m=>{er.textContent=m;return false};
  if(ad.length<8)return bad("Please enter your full delivery address with PIN code.");
  er.textContent="";return true}
 function wa(items,n,ph,a,tag){let tot=0,all=true,m="*New Order – Yzar Healthcare*"+(tag?" ("+tag+")":"")+"\n\n";
- items.forEach(([i,q],k)=>{const p=prod(i);m+=`${k+1}. ${p.name} (${p.pack}) × ${q}${p.price?" @ "+rs(p.price):""}\n`;if(p.price)tot+=p.price*q;else all=false});
+ items.forEach(([i,q],k)=>{const p=prod(i);m+=`${k+1}. ${p.name} (${p.pack}) × ${q}${p.price?" @ "+rs(p.price):""}\n${link(p)}\n`;if(p.price)tot+=p.price*q;else all=false});
  if(tot)m+=`\nEstimated total: ${rs(tot)}${all?"":" + items with price to be confirmed"}\n`;
  m+=`\n*Name:* ${n}\n*Mobile:* ${ph}\n*Address:* ${a}`;
  const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;if(!window.open(u,"_blank"))location.href=u}
 function order(){const ids=Object.keys(cart).filter(prod),er=$("#derr");if(!ids.length){er.textContent="Your cart is empty. Please add a medicine first.";return}
  const n=$("#nm").value.trim(),ph=$("#ph").value.trim(),ad=$("#ad").value.trim();if(!valid(n,ph,ad,er))return;
  cust.set({n,p:ph,a:ad});wa(ids.map(i=>[i,cart[i]]),n,ph,ad)}
-/* Buy Now – quick order popup */
-let bn={id:0,q:1};
-function renderBN(){const p=prod(bn.id);
- $("#bn-i").innerHTML=`<div class="th">${p.images&&p.images.length?`<img src="${ROOT}images/${p.images[0]}" alt="${p.name}">`:p.icon}</div><div class="mt"><b>${p.name}</b><small>${p.pack}</small><div class="price" style="font-size:1rem">${priceH(p)}</div>
- <div class="tt"><div class="qty"><button type="button" onclick="bq(-1)" aria-label="Decrease">−</button><span>${bn.q}</span><button type="button" onclick="bq(1)" aria-label="Increase">+</button></div><small><b style="display:inline;color:var(--tx)">${p.price?"Total "+rs(p.price*bn.q):"Price confirmed on WhatsApp"}</b></small></div></div>`}
-function bq(d){bn.q=Math.max(1,bn.q+d);renderBN()}
-function buyNow(id){bn={id,q:qs[id]||1};renderBN();const c=cust.get();$("#bn-n").value=c.n||"";$("#bn-m").value=c.p||"";$("#bn-a").value=c.a||"";$("#bn-e").textContent="";
- $("#qm").classList.add("open");$("#qov").classList.add("open");document.body.style.overflow="hidden";setTimeout(()=>$(c.n?"#bn-a":"#bn-n").focus({preventScroll:true}),120)}
-function closeBN(){$("#qm").classList.remove("open");$("#qov").classList.remove("open");document.body.style.overflow=""}
-function bnOrder(){const n=$("#bn-n").value.trim(),ph=$("#bn-m").value.trim(),ad=$("#bn-a").value.trim();if(!valid(n,ph,ad,$("#bn-e")))return;
- cust.set({n,p:ph,a:ad});wa([[bn.id,bn.q]],n,ph,ad,"Buy Now");qs[bn.id]=1;const e=$("#q"+bn.id);if(e)e.textContent=1;closeBN()}
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeBN();closeCart()}});
-document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#qm"))$("#bn-e").textContent="";else if(e.target.closest&&e.target.closest(".df"))$("#derr").textContent=""});
+/* Buy Now – opens WhatsApp directly with product + quantity */
+function buyNow(id){const p=prod(id),q=qs[id]||1,c=cust.get();
+ let m=`*New Order – Yzar Healthcare* (Buy Now)\n\n1. ${p.name} (${p.pack}) × ${q}${p.price?" @ "+rs(p.price):""}\n${link(p)}\n`;
+ if(p.price)m+=`\nEstimated total: ${rs(p.price*q)}\n`;
+ m+=`\n*Name:* ${c.n||""}\n*Address:* ${c.a||""}`;
+ qs[id]=1;const el=$("#q"+id);if(el)el.textContent=1;
+ const u=`https://wa.me/${WA}?text=${encodeURIComponent(m)}`;if(!window.open(u,"_blank"))location.href=u;
+ toast("✓ Opening WhatsApp… tap send to place your order")}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCart()}});
+document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest(".df"))$("#derr").textContent=""});
 document.body.insertAdjacentHTML("beforeend",`<div class="fab"><a class="w" href="https://wa.me/${WA}?text=Hello%20Yzar%20Healthcare" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">💬</a><a class="c" href="tel:+919315161042" aria-label="Call us">📞</a></div>
 <div class="ov" id="ov" onclick="closeCart()"></div><aside class="drawer" id="drawer" aria-label="Cart"><div class="dh"><b>Your Cart</b><button onclick="closeCart()" aria-label="Close">×</button></div><div class="items" id="items"></div>
 <div class="df"><input id="nm" placeholder="Your name" autocomplete="name"><input id="ph" placeholder="Your mobile number" inputmode="tel" autocomplete="tel"><textarea id="ad" rows="2" placeholder="Delivery address with PIN code" autocomplete="street-address"></textarea><p class="cerr" id="derr" role="alert"></p><button class="btn wa" onclick="order()">Order on WhatsApp</button></div></aside>
-<div class="qov" id="qov" onclick="closeBN()"></div>
-<div class="qm" id="qm" role="dialog" aria-modal="true" aria-labelledby="qt"><div class="qh"><b id="qt">Quick Order</b><button type="button" onclick="closeBN()" aria-label="Close">×</button></div>
-<div class="qb"><div class="qi" id="bn-i"></div>
-<div class="fr"><label for="bn-n">Your name</label><input id="bn-n" autocomplete="name"></div>
-<div class="fr"><label for="bn-m">Mobile number</label><input id="bn-m" type="tel" inputmode="tel" autocomplete="tel" placeholder="10-digit mobile number"></div>
-<div class="fr"><label for="bn-a">Delivery address</label><textarea id="bn-a" rows="2" autocomplete="street-address" placeholder="House no, area, city, PIN code"></textarea></div>
-<p class="cerr" id="bn-e" role="alert"></p><button class="btn wa" type="button" onclick="bnOrder()">Order on WhatsApp</button>
-<p class="qn">🔒 Your details are used only to process this order. WhatsApp opens with your order ready to send.</p></div></div>`);
+`);
 {const c=cust.get();if(c.n)$("#nm").value=c.n;if(c.p)$("#ph").value=c.p;if(c.a)$("#ad").value=c.a}
 const sl=$("#slides");let cur=0,tm;
 if(sl){const N=sl.children.length;$("#dots").innerHTML=[...Array(N)].map((_,i)=>`<button onclick="to(${i})" aria-label="Slide ${i+1}"></button>`).join("");
